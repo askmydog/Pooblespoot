@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2>Regex Lab Test Script</h2>
+
+
+<p id="demo">YOU BROKE THE CODE</p>
+
+<textarea id="testinput" onkeyup="BMP_generator(testinput.value)"></textarea>
+<br>
+<p id="demo2"></p>
+
+<script>
+//initial check to make sure nothing I did broke the script
+document.getElementById("demo").innerHTML="Enter as many lines of 'sodium' followed by a number, the results should display below";
+//Clear the output area
+document.getElementById("demo2").innerHTML = "";
+
+
+//Feed textarea into function which looks for BMP data
+function BMP_generator(input){
+    //Look for any number (int or float) preceded by "sodium" or "na" and up to 4 spaces, ":" or "-"
+    let search_terms = ['sodium','na',];
+//create an array where sodium values will be stored
+    var sodium = Regex_Exec(input, search_terms);
+
+/*
+    let rexp_chloride = []
+    var chloride = Regex_Exec(input, rexp_chloride);
+    */
+//Display results of Regex_Exec below textbox
+    document.getElementById("demo2").innerHTML = "Sodium:"+ sodium;
+
+}
+
+function Regex_Exec(reg_input, terms){
+
+    let reg_array = [];
+    reg_exp = new RegExp('((?<=(('+ terms.join('|') +')(\\D)+))\\d+(\\.\\d+)?)','ig');
+    //alert(reg_exp);  
+    let i = 0;
+// Loop through input using regex, assign each match to subsequent array element of reg_array
+    while (reg_result = reg_exp.exec(reg_input)){
+        reg_array[i]=reg_result[0];
+        //Store any additional matches as the difference from the initial match
+        //if (i>0){reg_array[i] = reg_array[0] - reg_result[0];}
+        i++;
+    }
+    return reg_array
+}
+
+</script>
+
+</body>
+</html>
