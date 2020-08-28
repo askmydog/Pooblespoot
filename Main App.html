@@ -103,7 +103,7 @@ function pooble(){
   let neg_bunterms = ['creatinine'];
   let creatinine_terms = ['creatinine','\\bcr\\b'];
   let neg_creatinineterms = ['nitrogen'];
-  let rexp_glucose = /(?<=((glucose\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
+  let rexp_glucose = ['glucose','\\bglc\\b'];
   let rexp_aniongap = /(?<=((anion gap\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
   let rexp_calcium = /(?<=((calcium\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
   let rexp_gfr = /(?<=((non-black\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
