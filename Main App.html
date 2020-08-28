@@ -104,10 +104,11 @@ function pooble(){
   let creatinine_terms = ['creatinine','\\bcr\\b'];
   let neg_creatinineterms = ['nitrogen'];
   let glucose_terms = ['glucose','\\bglc\\b'];
-  let rexp_aniongap = /(?<=((anion gap\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
-  let rexp_calcium = /(?<=((calcium\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
-  let rexp_gfr = /(?<=((non-black\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
-  let rexp_gfrb = /(?<=((gfr black\t\w+|rate black\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig; 
+  let aniongap_terms = ['anion gap','\\bAG\\b'];
+  let calcium_terms = ['calcium','\\bca\\b'];
+  let gfrNB_terms = ['glomerular filtration rate','\\bgfr\\b'];
+  let neg_gfrNBterms = ['black'];
+  let gfrBlack_terms = ['gfr black','glomerular filtration rate black'];
   
   /* //CMP and hepatic panel terms
   let rexp_ast = /(?<=((aspartate aminotransferase\s\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
