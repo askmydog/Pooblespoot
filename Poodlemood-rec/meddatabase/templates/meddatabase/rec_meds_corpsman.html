@@ -1,0 +1,23 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Reconcile: {{ patient.last_name }}</h1>
+    <tr>
+  <th><label for="med_list">Input:</label></th>
+  <td>
+    <form method="get" action="/search/">
+  Search Meds:<input type="text" name="q" id="id_q" value="{{ query }}"/>
+  <input type="submit" value="Search" />
+</form>
+    <br>
+    <span class="helptext">Paste in meds from AHLTA</span>
+  </td>
+</tr>
+  <form action="" method="post">
+    {% csrf_token %}
+    <table>
+    {{ form.as_table }}
+    </table>
+    <input type="submit" value="Submit">
+  </form>
+{% endblock %}

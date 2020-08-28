@@ -1,0 +1,21 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>MED WRECK OUTPUT</h1>
+  <p>Welcome to MED WRECK, a website developed by <em>The great and powerful LORD POOBLE ESQ</em>!</p>
+  <p>Here's your data:</p>
+  <ul>
+    {% if med %}
+  {% for med in results %}
+    {{ med.medication_name }}
+
+  {% endfor %}
+{% else %}
+    <h3 class='error'>Please enter a medication</h3>
+    <form method="get" action="/search/">
+      Search meds:<input type="text" name="q" id="id_q" value="{{ query }}"/>
+      <input type="submit" value="Search" />
+    </form>
+{% endif %}
+  </ul>
+{% endblock %}

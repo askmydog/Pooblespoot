@@ -1,0 +1,22 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Patient: {{ patient.first_name }} {{ patient.last_name }}</h1>
+
+  <p><strong>Date of birth</strong> {{ patient.date_of_birth }}</p> 
+
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Prescriptions</h4>
+
+    {% for patient in patient.medinstance_set.all %}
+      <hr>
+      <p class="{% if med.status == 'a' %}text-success{% elif med.status == 'o' %}text-danger{% else %}text-warning{% endif %}">
+        {{ patient.get_status_display }}
+      </p>
+     	
+        <p><strong>Medication:</strong> <a href="{{ patient.med.get_absolute_url }}">{{ patient.med }}</a></p>
+        <p class="text-muted"><strong>Date Prescibed:</strong> {{ patient.date_prescribed }}</p>
+
+    {% endfor %}
+  </div>
+{% endblock %}

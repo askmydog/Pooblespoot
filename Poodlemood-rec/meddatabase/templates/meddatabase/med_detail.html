@@ -1,0 +1,28 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Medication: {{ med.medication_name }}</h1>
+
+  <p><strong>Generic Name</strong> <a href="">{{ med.medication_name }}</a></p> <!-- author detail link not yet defined -->
+  <p><strong>Mechanism:</strong> {{ med.mechanism_of_action }}</p>
+  <p><strong>Phonetic spelling:</strong> {{ med.phonetic_name }}</p> 
+  <p><strong>Brand Name:</strong> {{ med.brand_name }}</p>  
+  <p><strong>Route:</strong> {{ med.route }}</p> 
+  <p><strong>Indications:</strong> {{ med.indication.all|join:", " }}</p>  
+
+  <div style="margin-left:20px;margin-top:20px">
+    <h4>Prescriptions</h4>
+
+    {% for med in med.medinstance_set.all %}
+      <hr>
+      <p class="{% if med.status == 'a' %}text-success{% elif med.status == 'o' %}text-danger{% else %}text-warning{% endif %}">
+        {{ med.get_status_display }}
+      </p>
+      {% if med.status != 'a' %}
+        <p><strong>Date Prescribed:</strong> {{ med.date_prescribed }}</p>
+      {% endif %}
+      <p><strong>Patient:</strong> {{ med.patient }}</p>
+      <p class="text-muted"><strong>Frequency:</strong> {{ med.frequency }}</p>
+    {% endfor %}
+  </div>
+{% endblock %}

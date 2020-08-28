@@ -1,0 +1,16 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>Med List</h1>
+  {% if med_list %}
+  <ul>
+    {% for med in med_list %}
+      <li>
+        <a href="{{ med.get_absolute_url }}">{{ med.medication_name }}</a> ({{med.dose}})
+      </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p>There are no meds in the database</p>
+  {% endif %}       
+{% endblock %}

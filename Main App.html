@@ -1,0 +1,367 @@
+<!DOCTYPE HTML>
+
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="http://www.w3schools.com/lib/w3.css">
+	<meta name="description" content="Pooble Spoot">
+	<title>Pooble SPOOT: Improving patient care since 2016</title>
+	<link rel="icon" type="image/png" href="/favicon.png">
+
+
+<style>
+textarea {
+	font-size: 75%;
+	line-height: 95%;
+	font-family: courier;
+    background-color: white;
+}
+  header, footer {
+    padding: 1em;
+    color: White;
+    font-family: unicorn;
+    background-color:DodgerBlue;
+    clear: left;
+    text-align: center;
+}
+  header1 {
+    padding: 1em;
+    color: black;
+    font-family: unicorn;
+    background-color: skyblue;
+    clear: left;
+    text-align: center;
+}
+  main{
+    padding: 1em;
+    color: White;
+    background-color: MediumSeaGreen;
+    clear: left;
+    text-align: center;
+  }
+
+</style>	
+</head>
+<body>
+
+	<div id="layout">
+
+		<div >
+          <header>
+            <h2 class="content-subhead"><strong>POOBLE SPOOT - NOW WITH REGEX TECHNOLOGY<br/></h2>
+          </header>
+          <main>
+			<p>
+				Enter AHLTA Labs without reference ranges:<br/><i>No data are stored or transmitted by this process, all operations take place within your web browser on your local machine <br/> DO NOT ENTER ANY PII OR PATIENT IDENTIFIERS, LAB RESOLVER WILL NOT WORK IF THESE ARE ENTERED.  </i><br/>Delete blank lines off the end of your data if you encounter problems  <br/>
+				<textarea rows='20' cols='150' id="lab_input" onkeyup="pooble()"></textarea>
+
+	
+              <br/> <br/>
+				<textarea rows='40' cols='150' id="lab_output" type='text'></textarea>
+			</p>							
+          </main>
+		</div>
+	</div>
+      
+      
+      <script>
+       
+function pooble(){
+  var rawlabtext=document.getElementById("lab_input").value;
+  var lineArr = rawlabtext.split("\n");
+  var titleLocString = "";
+  var titleLocArray;
+  var titleLocArray2;
+  var prevDate = "nu";
+  var prevTime = "nu";
+  var testTitle;
+  var testDate;
+  var testTime;
+  var currTest; //contains array of only one test
+  var currTestStr = "";
+  var currLine2 = "";
+  var header; //contains title line
+  var output = "";
+  for (var i = 0; i<lineArr.length; i++){
+    if (lineArr[i].indexOf("Site / Specimen") !=  -1){
+      titleLocString += i + "\t";
+    }//endif          
+  }//endfor
+  
+  //Create two arrays containing the indices of each title
+  titleLocArray = titleLocString.split("\t");
+  titleLocString += lineArr.length; 
+  titleLocArray2 = titleLocString.split("\t");
+  
+  //declare all the search terms for each lab test in an array, and any terms that we want to exclude in a separate array.  NB any '\' in search terms need to be written as '\\', and abbreviations should be bracketed with a \\b (indicating the abbreviation is not part of another word) 
+  let sodium_terms = ['sodium','\\bna\\b'];
+  let potassium_terms = ['potassium','\\bk\\b'];
+  let chloride_terms = ['chloride','\\bcl\\b'];
+  let bicarbonate_terms = ['bicarbonate','carbon dioxide','bicarb','\\bco2\\b'];
+  let bun_terms = ['urea nitrogen','\\bbun\\b',];
+  let neg_bunterms = ['creatinine'];
+  let creatinine_terms = ['creatinine','\\bcr\\b'];
+  let neg_creatinineterms = ['nitrogen'];
+  let glucose_terms = ['glucose','\\bglc\\b'];
+  let aniongap_terms = ['anion gap','\\bAG\\b'];
+  let calcium_terms = ['calcium','\\bca\\b'];
+  let gfrNB_terms = ['glomerular filtration rate','\\bgfr\\b'];
+  let neg_gfrNBterms = ['black','site','panel'];
+  let gfrBlack_terms = ['gfr black','glomerular filtration rate black'];
+  let mag_terms = ['magnesium','mag','\\bmg\\b'];
+  let neg_magterms = ['\\bdl\\b','\\bl\\b','\\bml\\b']
+  let phos_terms = ['phosphate','\\bphos\\b'];
+  
+  /* //CMP and hepatic panel terms
+  let rexp_ast = /(?<=((aspartate aminotransferase\s\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
+  let rexp_alt = /(?<=((alanine aminotransferase\s\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
+  let rexp_ap = /(?<=((phosphatase\s\w+|phos\s\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
+  let rexp_protein = /(?<=((protein\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
+  let rexp_albumin = /(?<=((albumin\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
+  let rexp_tbili = /(?<=((bilirubin\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
+  let rexp_dbili = /(?<=((conjugated\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
+  
+  //CBC terms
+  let rexp_wbc = /(?<=((wbc\s\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
+  let rexp_hgb = /(?<=((hemoglobin\s\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
+  let rexp_hct = /(?<=((hematocrit\s\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
+  let rexp_plt = /(?<=((platelets\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
+  let rexp_perneu = /(?<=((neutrophils\t\w+)(\:|\-|\s){1,4})(?<!(abs\sneutrophils\s{1,4}\w+\s{1,4}))\d+(\.\d+)?/ig;
+  let rexp_perlymph = /(?<=((lymphocytes\t\w+)(\:|\-|\s){1,4})(?<!(abs\slymphocytes\s{1,4}\w+\s{1,4}))\d+(\.\d+)?/ig;
+  let rexp_permono = /(?<=((monocytes\t\w+)(\:|\-|\s){1,4})(?<!(abs\smonocytes\s{1,4}\w+\s{1,4}))\d+(\.\d+)?/ig;
+  let rexp_pereo = /(?<=((eosinophils\t\w+)(\:|\-|\s){1,4})(?<!(abs\seosinophils\s{1,4}\w+\s{1,4}))\d+(\.\d+)?/ig;
+  let rexp_perbaso = /(?<=((basophils\t\w+)(\:|\-|\s){1,4})(?<!(abs\sbasophils\s{1,4}\w+\s{1,4}))\d+(\.\d+)?/ig;
+  let rexp_mcv = /(?<=((mcv\s\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
+  let rexp_rdw = /(?<=((rdw\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
+  */
+  
+  
+  //Loop that now processes each lab one at a time
+  for(var z = 0; z<titleLocArray.length-1 ;z++){
+    currTest = lineArr.slice(titleLocArray[z],titleLocArray2[z+1]);
+    header = currTest[0].split("\t");
+    testTitle = header[0];
+    testDate = header[2].substring(0,12);
+    testTime = header[2].substring(12,header[2].length);
+    testTime = testTime.replace(" <o>","");
+            
+    //Check if date is unique
+    if (testDate !== prevDate){
+      output+= "\n<~~~~~~~~~~~~~~~~~~~~~~~~~~~~"+testDate+"~~~~~~~~~~~~~~~~~~~~~~~~~~~>\n";
+      output+= "                                                       [ Time: "+testTime+" ] \n\n";
+      prevTime = testTime;
+      prevDate = testDate;
+    }//endif
+            
+    //Check if time is unique
+    if (testTime !== prevTime){
+      output+= "\t\t\t\t\t\t\t[ Time: "+testTime+" ] \n";
+      prevTime = testTime;
+    }//endif            
+
+
+    
+   //NEW BMP START          
+    if (testTitle.indexOf("Basic Metabolic") != -1){
+
+      //create arrays where individual values will be stored
+      var sodium = Regex_Exec(currTest, sodium_terms);
+      var potassium = Regex_Exec(currTest, potassium_terms);
+      var chloride = Regex_Exec(currTest, chloride_terms);
+      var bicarbonate = Regex_Exec(currTest, bicarbonate_terms);
+      var bun = Regex_Exec(currTest, bun_terms, neg_bunterms);
+      var creatinine = Regex_Exec(currTest, creatinine_terms, neg_creatinineterms);
+      var glucose = Regex_Exec(currTest, glucose_terms);
+      var anion_gap = Regex_Exec(currTest, aniongap_terms);
+      var calcium = Regex_Exec(currTest, calcium_terms);
+      var GFR = Regex_Exec(currTest, gfrNB_terms,neg_gfrNBterms);
+      var GFRb = Regex_Exec(currTest, gfrBlack_terms);
+      var phosphate = Regex_Exec(currTest,phos_terms);
+      var magnesium = Regex_Exec(currTest,mag_terms, neg_magterms);
+      
+      // Caculate osms
+      var osms = sodium*2 + glucose/18 + bun/2.8;
+      var osms = parseInt(osms);
+      
+      //Calciualte delta/delta
+      if (bicarbonate < 24){
+      var deldel = (anion_gap-12)/(24-bicarbonate);
+      }
+      
+      //found values run through pad8() to make uniform length for output formatting
+      sodium = pad8(sodium);
+      potassium = pad8(potassium);
+      bicarbonate = pad8(bicarbonate);
+      chloride = pad8(chloride);
+      bun = pad8(bun);
+      creatinine = pad8(creatinine);
+      glucose = pad8(glucose);
+      anion_gap = pad8(anion_gap);
+      calcium = pad8(calcium);
+      GFR = pad8(GFR);
+      GFRb = pad8(GFRb);
+      
+      //Build output
+      output +=  "    "+sodium+" | "+chloride+"| "+bun+"           AG    "+anion_gap+"    Ca   "+calcium+"\n";
+      output += "   ------------+-----------+--------< "+glucose+" GFR   "+GFR+"   Mg      "+magnesium+"\n";
+      output += "    "+potassium+" | "+bicarbonate+" | "+creatinine+"         GFR-b "+GFRb+"  Phos    "+phosphate+"\n\n";
+      output += "    Calculated Osms "+osms;
+      
+      if (bicarbonate < 24){
+      output += "   Delta/Delta: "+deldel.toFixed(2);
+      }
+      
+      output += "\n\n";
+    } //bmp end
+
+/*if (testTitle.indexOf("Comprehensive Metabolic") != -1){
+
+      //create arrays where individual values will be stored
+      var sodium = Regex_Exec(currTest, rexp_sodium);
+      var potassium = Regex_Exec(currTest, rexp_potassium);
+      var chloride = Regex_Exec(currTest, rexp_chloride);
+      var bicarbonate = Regex_Exec(currTest, rexp_bicarbonate);
+      var bun = Regex_Exec(currTest, rexp_bun);
+      var creatinine = Regex_Exec(currTest, rexp_creatinine);
+      var glucose = Regex_Exec(currTest, rexp_glucose);
+      var anion_gap = Regex_Exec(currTest, rexp_aniongap);
+      var calcium = Regex_Exec(currTest, rexp_calcium);
+      var GFR = Regex_Exec(currTest, rexp_gfr);
+      var GFRb = Regex_Exec(currTest, rexp_gfrb);
+      var ast = Regex_Exec(currTest, rexp_ast);
+      var alt = Regex_Exec(currTest, rexp_alt);
+      var ap = Regex_Exec(currTest, rexp_ap);
+      var protein = Regex_Exec(currTest, rexp_protein);
+      var albumin = Regex_Exec(currTest, rexp_albumin);
+      var tbili = Regex_Exec(currTest, rexp_tbili);
+      var dbili = Regex_Exec(currTest, rexp_dbili);
+      
+      // Caculate osms
+      var osms = sodium*2 + glucose/18 + bun/2.8;
+      var osms = parseInt(osms);
+      
+      //Calciualte delta/delta
+      if (bicarbonate < 24){
+      var deldel = (anion_gap-12)/(24-bicarbonate);
+      }
+           
+      //Calculate corrected calcium
+      var cca = 0.8*(4-albumin + calcium);
+      cca = cca.toFixed(2);
+             
+      //Calculate R factor
+      var rfact = (alt/52) / (ap/126) );
+      rfact = rfact.toFixed(2);
+      
+      //found values run through pad8() to make uniform length for output formatting
+      sodium = pad8(sodium);
+      potassium = pad8(potassium);
+      bicarbonate = pad8(bicarbonate);
+      chloride = pad8(chloride);
+      bun = pad8(bun);
+      creatinine = pad8(creatinine);
+      glucose = pad8(glucose);
+      anion_gap = pad8(anion_gap);
+      calcium = pad8(calcium);
+      GFR = pad8(GFR);
+      GFRb = pad8(GFRb);
+      ast = pad8(ast);
+      alt = pad8(alt);
+      protein = pad8(protein);
+      albumin = pad8(albumin);
+      tbili = pad8(tlbumin);
+      dbili = pad8(dbili);
+      
+      //Build output
+      output += "    "+sodium+" | "+chloride+" | "+bun+"\n";
+      output += "   ----------+----------+-------< "+glucose+"\n";
+      output += "    "+potassium+" | "+bicarbonate+" | "+creatinine+" \tGFR"+GFR+"\tGFR-B "+GFRb+"\n\n";               
+ 
+      output += "  Ca - \t"+calcium+"|"+ast+"- AST\n";
+      output += "           ---------- \n";
+      output += "  Prot-\t"+protein+"|"+alt+"- ALT\n";
+      output += "           ---------- \n";
+      output += "  Alb -\t"+albumin+"|"+ap+"- AP\n";
+      output += "               ^ \n";
+      output += "     tBili -"+tbili+"       \n\n";
+      output += "  Calculated Osms "+osms+" \t Corrected Ca "+cca+"\n\n"; 
+      output += "  R Factor - "+rfact+" (Calculated with ALT ULN 52, AP ULN 126)\n";
+      
+      if (bicarbonate < 24){
+      output += "   Delta/Delta: "+deldel.toFixed(2);
+      }
+      
+      output += "\n\n";
+    } //cmp end */
+    
+    else{
+    	output += testTitle.toUpperCase()+"\n\n";
+      for(var x =1; x<currTest.length;x++){
+        var currLine = currTest[x].split("\t");
+        currLine[2] = currLine[2].replace("<i>","").replace("<r>","").replace("(H)","*").replace("(L)","*").replace("(H*)","**").replace("(L*)","**");
+        if (currLine[0].length != 0){
+          output += "     "+currLine[0]+" = "+currLine[2]+"\n";
+        }//endif
+      }//endfor
+      output+= "\n";
+     }      
+
+    document.getElementById("lab_output").value = output;
+  }//endfor
+}//End pooble
+
+function Regex_Exec(reg_input,terms,neg_terms=''){
+  let reg_array = [];
+  let regexp_patt = '';
+  let i = 0;
+  //if no negative terms were passed from the original function, construct a regex pattern using the search terms, else include a negative lookbehind and lookahead using neg_terms to exclude them  
+  if (neg_terms == '') {
+    regexp_patt = '(?<=(('+ terms.join('|') +')\\D+))\\d+(\\.\\d+)?';
+  } else {
+    regexp_patt = '(?<=((?<!('+neg_terms.join('|')+'\\W+))('+ terms.join('|') +')(?!\\W('+neg_terms.join('|')+'))\\D+))\\d+(\\.\\d+)?';   
+  }
+    let reg_exp = new RegExp(regexp_patt,'ig');  
+    console.log(reg_exp);
+// Loop through input using regex, assign each match to subsequent array element of reg_array
+  while (reg_result = reg_exp.exec(reg_input)){
+    reg_array[i]=reg_result[0];
+    i++;
+  }
+  
+  return reg_array
+}      
+
+function pad8(str){
+    if (str.length === 7){
+		str = " " + str;
+	}
+	else if (str.length === 6){
+		str = " " + str + " ";
+	}
+	else if (str.length === 5){
+		str = "  " + str + " ";
+	}
+	else if (str.length === 4){
+		str = "  " + str+"  ";
+	}
+	else if (str.length === 3){
+		str = "  " + str + "   ";
+	}
+	else if (str.length === 2){
+		str = "   " + str + "   ";
+	}
+	else if (str.length === 1){
+		str = "   " + str + "    ";
+	}
+	else if (str.length === 0){
+		str = str + "     ";
+	}
+	return str;
+}
+
+      </script>
+
+</body>
+</html>
+

@@ -1,0 +1,19 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+    <h1>My Prescribed Medications</h1>
+
+    {% if medinstance_list %}
+    <ul>
+
+      {% for medinst in medinstance_list %} 
+      <li class="{% if medinst.is_out %}text-danger{% endif %}">
+        <a href="{% url 'med-detail' medinst.med.pk %}">{{medinst.med.medication_name}}</a> ({{ medinst.date_prescribed }})        
+      </li>
+      {% endfor %}
+    </ul>
+
+    {% else %}
+      <p>There are no medications prescribed by you</p>
+    {% endif %}       
+{% endblock %}

@@ -1,0 +1,14 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+  <h1>MED WRECK Home</h1>
+  <p>Welcome to MED WRECK, a website developed by <em>The great and powerful LORD POOBLE ESQ</em>!</p>
+  <h2>Database Summary</h2>
+  <p>The med list has the following record counts:</p>
+  <ul>
+    <li><strong>Meds:</strong> {{ num_meds }}</li>
+    <li><strong>Prescriptions:</strong> {{ num_instances }}</li>
+    <li><strong>Number of meds that are out:</strong> {{ num_instances_out }}</li>
+    <li><strong>Patients:</strong> {{ num_patients }}</li>
+  </ul>
+{% endblock %}
