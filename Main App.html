@@ -103,7 +103,7 @@ function pooble(){
   let neg_bunterms = ['creatinine'];
   let creatinine_terms = ['creatinine','\\bcr\\b'];
   let neg_creatinineterms = ['nitrogen'];
-  let rexp_glucose = ['glucose','\\bglc\\b'];
+  let glucose_terms = ['glucose','\\bglc\\b'];
   let rexp_aniongap = /(?<=((anion gap\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
   let rexp_calcium = /(?<=((calcium\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
   let rexp_gfr = /(?<=((non-black\t\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
@@ -168,7 +168,7 @@ function pooble(){
       var bicarbonate = Regex_Exec1(currTest, bicarbonate_terms);
       var bun = Regex_Exec1(currTest, bun_terms, neg_bunterms);
       var creatinine = Regex_Exec1(currTest, creatinine_terms, neg_creatinineterms);
-      var glucose = Regex_Exec(currTest, rexp_glucose);
+      var glucose = Regex_Exec1(currTest, rexp_glucose);
       var anion_gap = Regex_Exec(currTest, rexp_aniongap);
       var calcium = Regex_Exec(currTest, rexp_calcium);
       var GFR = Regex_Exec(currTest, rexp_gfr);
