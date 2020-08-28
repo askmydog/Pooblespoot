@@ -107,8 +107,11 @@ function pooble(){
   let aniongap_terms = ['anion gap','\\bAG\\b'];
   let calcium_terms = ['calcium','\\bca\\b'];
   let gfrNB_terms = ['glomerular filtration rate','\\bgfr\\b'];
-  let neg_gfrNBterms = ['black'];
+  let neg_gfrNBterms = ['black','site','panel'];
   let gfrBlack_terms = ['gfr black','glomerular filtration rate black'];
+  let mag_terms = ['magnesium','mag','\\bmg\\b'];
+  let neg_magterms = ['\\bdl\\b','\\bl\\b','\\bml\\b']
+  let phos_terms = ['phosphate','\\bphos\\b'];
   
   /* //CMP and hepatic panel terms
   let rexp_ast = /(?<=((aspartate aminotransferase\s\w+)(\:|\-|\s){1,4}))\d+(\.\d+)?/ig;
@@ -163,17 +166,19 @@ function pooble(){
     if (testTitle.indexOf("Basic Metabolic") != -1){
 
       //create arrays where individual values will be stored
-      var sodium = Regex_Exec1(currTest, sodium_terms);
-      var potassium = Regex_Exec1(currTest, potassium_terms);
-      var chloride = Regex_Exec1(currTest, chloride_terms);
-      var bicarbonate = Regex_Exec1(currTest, bicarbonate_terms);
-      var bun = Regex_Exec1(currTest, bun_terms, neg_bunterms);
-      var creatinine = Regex_Exec1(currTest, creatinine_terms, neg_creatinineterms);
-      var glucose = Regex_Exec1(currTest, rexp_glucose);
-      var anion_gap = Regex_Exec(currTest, rexp_aniongap);
-      var calcium = Regex_Exec(currTest, rexp_calcium);
-      var GFR = Regex_Exec(currTest, rexp_gfr);
-      var GFRb = Regex_Exec(currTest, rexp_gfrb);
+      var sodium = Regex_Exec(currTest, sodium_terms);
+      var potassium = Regex_Exec(currTest, potassium_terms);
+      var chloride = Regex_Exec(currTest, chloride_terms);
+      var bicarbonate = Regex_Exec(currTest, bicarbonate_terms);
+      var bun = Regex_Exec(currTest, bun_terms, neg_bunterms);
+      var creatinine = Regex_Exec(currTest, creatinine_terms, neg_creatinineterms);
+      var glucose = Regex_Exec(currTest, glucose_terms);
+      var anion_gap = Regex_Exec(currTest, aniongap_terms);
+      var calcium = Regex_Exec(currTest, calcium_terms);
+      var GFR = Regex_Exec(currTest, gfrNB_terms,neg_gfrNBterms);
+      var GFRb = Regex_Exec(currTest, gfrBlack_terms);
+      var phosphate = Regex_Exec(currTest,phos_terms);
+      var magnesium = Regex_Exec(currTest,mag_terms, neg_magterms);
       
       // Caculate osms
       var osms = sodium*2 + glucose/18 + bun/2.8;
@@ -199,8 +204,8 @@ function pooble(){
       
       //Build output
       output +=  "    "+sodium+" | "+chloride+"| "+bun+"           AG    "+anion_gap+"    Ca   "+calcium+"\n";
-      output += "   ------------+-----------+--------< "+glucose+" GFR   "+GFR+" \n";
-      output += "    "+potassium+" | "+bicarbonate+" | "+creatinine+"         GFR-b "+GFRb+" \n\n";
+      output += "   ------------+-----------+--------< "+glucose+" GFR   "+GFR+"   Mg      "+magnesium+"\n";
+      output += "    "+potassium+" | "+bicarbonate+" | "+creatinine+"         GFR-b "+GFRb+"  Phos    "+phosphate+"\n\n";
       output += "    Calculated Osms "+osms;
       
       if (bicarbonate < 24){
@@ -306,33 +311,18 @@ function pooble(){
   }//endfor
 }//End pooble
 
-function Regex_Exec1(reg_input,terms,neg_terms=''){
-  let reg_array1 = [];
+function Regex_Exec(reg_input,terms,neg_terms=''){
+  let reg_array = [];
   let regexp_patt = '';
+  let i = 0;
   //if no negative terms were passed from the original function, construct a regex pattern using the search terms, else include a negative lookbehind and lookahead using neg_terms to exclude them  
   if (neg_terms == '') {
     regexp_patt = '(?<=(('+ terms.join('|') +')\\D+))\\d+(\\.\\d+)?';
   } else {
     regexp_patt = '(?<=((?<!('+neg_terms.join('|')+'\\W+))('+ terms.join('|') +')(?!\\W('+neg_terms.join('|')+'))\\D+))\\d+(\\.\\d+)?';   
   }
-    let reg_exp1 = new RegExp(regexp_patt,'ig');  
-    //alert(reg_exp); 
-  let i = 0;
-
-// Loop through input using regex, assign each match to subsequent array element of reg_array
-  while (reg_result1 = reg_exp1.exec(reg_input)){
-    reg_array1[i]=reg_result1[0];
-    i++;
-  }
-  
-  return reg_array1
-}      
-
-function Regex_Exec(reg_input, reg_exp){
-  let reg_array = [];
-  let reg_exec;
-  let i = 0;
-
+    let reg_exp = new RegExp(regexp_patt,'ig');  
+    console.log(reg_exp);
 // Loop through input using regex, assign each match to subsequent array element of reg_array
   while (reg_result = reg_exp.exec(reg_input)){
     reg_array[i]=reg_result[0];
@@ -340,7 +330,7 @@ function Regex_Exec(reg_input, reg_exp){
   }
   
   return reg_array
-}       
+}      
 
 function pad8(str){
     if (str.length === 7){
