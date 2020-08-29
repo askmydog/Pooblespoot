@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.mixins import LoginRequiredMixin
 
 # Create your views here.
-from meddatabase.models import Med, Patient, MedInstance, Indication
+from meddatabase.models import Med, Patient, MedInstance, Indication, Med_Class
 
 def index(request):
     """View function for home page of site."""
@@ -39,7 +39,9 @@ class MedDetailView(generic.DetailView):
 class PatientListView(LoginRequiredMixin, generic.ListView):
     model = Patient
 
- 
+class MedClassView(generic.Listview):
+    model = Med_Class
+
 class PatientDetailView(LoginRequiredMixin, generic.DetailView):
     model = Patient
     paginate_by = 25

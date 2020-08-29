@@ -41,13 +41,13 @@ class Med(models.Model):
     medication_name = models.CharField(max_length=200)
     phonetic_name = models.CharField(max_length=200, help_text='Spell the medication name phonetically')
     brand_name = models.CharField(max_length=200, help_text='Brand name of the medication')
-
+    med_class = models.ForeignKey('Med_Class', verbose_name='Medication Class', help_text='Enter the name of the medication class', on_delete=models.SET_NULL, null=True)
     # Foreign Key used because book can only have one author, but authors can have multiple books
     # Author as a string rather than object because it hasn't been declared yet in the file
     dose = models.CharField('Dose', max_length = 10)
     route = models.ForeignKey(Route, on_delete=models.SET_NULL, null=True)    
     mechanism_of_action = models.TextField(max_length=1000, help_text='Enter a brief description of the mechanism of action')
-
+  
     
     # ManyToManyField used because genre can contain many books. Books can cover many genres.
     # Genre class has already been defined so we can specify the object above.
@@ -120,3 +120,7 @@ class Patient(models.Model):
     def __str__(self):
         """String for representing the Model object."""
         return f'{self.last_name}, {self.first_name}'
+
+class Med_Class(models.Model):
+    class_name = models.CharField(max_length=100, verbose_name='Medication Class', help_text='Enter a medication class')
+    interactions = models.ManyToManyField('Med_Class', verbose_name='Interactions', help_text='Enter the classes this medication interacts with',blank=True, null=True)
