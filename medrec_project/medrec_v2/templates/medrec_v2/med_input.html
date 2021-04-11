@@ -1,0 +1,279 @@
+{% extends 'medrec_v2/base.html' %}
+
+
+
+{% block header %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h1 class="display-2">Medication Reconciliation</h1>
+        </div>
+    </div>
+</div>
+{% endblock header %}
+
+
+
+
+{% block content %}
+<div class="container-fluid">
+    <form id="med_input_form">
+        <div class="form-group" >
+            {% csrf_token %}
+            <label for="{{form.input_meds.id_for_label}}">{{form.input_meds.label}}</label>
+            {{form.input_meds}}
+        </div>
+        <button type="submit" class="btn btn-primary">Reconcile Meds</button> 
+    </form>
+</div>
+
+<div class="container m-3">
+    <div class="row">
+        <div class="col-md">
+            <table class="table table-hover table-fixed">
+                <thead class="thead-light">
+                  <tr> 
+                    <th scope="col" style="width: 25%">Medication</th>
+                    <th scope="col" style="width: 15%">Dose</th>
+                    <th scope="col" style="width 40%">Instructions</th>
+                    <th scope="col">Common Uses</th>
+                  </tr>
+                </thead>
+                <tbody id="med_output">
+                </tbody>
+              </table>
+        </div>
+    </div>
+    
+</div>
+
+<div id="multi_med_modal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modaltitle"> Multiple Medications Found!</h4>
+                    <button type="button" class="close" data-dismiss="modal" data-target="#multi_med_modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid" >
+                    <form>
+                        <div class="row">
+                            <div class = "col-">
+                            <div class="input_group" id="multi_med_modal_form"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <button type="button" class="btn btn-primary" id="multi-submit-btn">Submit</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" data-target="#multi_med_modal">close</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+        </div>
+    </div>
+</div>
+
+<div id="no_med_modal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="modaltitle"> Multiple Medications Found!</h4>
+                    <button type="button" class="close" data-dismiss="modal" data-target="#no_med_modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid" >
+                    <form>
+                        <div class="row">
+                            <div class = "col-">
+                            <div class="input_group" id="no_med_modal_form"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <button type="button" class="btn btn-primary" id="no-submit-btn">Submit</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" data-target="#no_med_modal">close</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+                <div class="modal-footer">
+        </div>
+    </div>
+</div>
+
+
+<script>
+    console.log('MedInput page loaded');
+
+    /*------------med_urls Dictionary---------------------*/
+    med_urls = {}
+    url_path = '{{ request.build_absolute_uri }}'
+    {% for med in med_set %}
+        var abs_url = '{{med.get_absolute_url}}'
+        abs_url = abs_url.slice(1)
+        med_urls[{{med.pk}}] = url_path+abs_url
+    {% endfor %}
+    // var med_urls = JSON.parse("{{med_urls|escapejs}}")
+
+
+
+    /*------------AJAX FUNCTION---------------------*/
+    $("#med_input_form").submit(function(event){
+        console.log('Med Input Form Submitted');
+        event.preventDefault();
+
+        var serializedData = $(this).serialize();
+        $.ajax({
+            type: "POST",
+            url: '{% url "medrec_v2:post_medrec" %}',
+            data: serializedData,
+            success: function(response) {
+                $('#med_output').html("");
+
+                var med_ajax = JSON.parse(response["med_output"]);
+                line_no = 0
+                med_ajax.line.forEach(line => {
+                    console.log(line)
+                    line_no += 1
+                    input_text = line[0]
+                    med_list = line[1]
+                    dose = line[2]
+                    sig = line[3]
+                    $('#med_output').append("<tr id='output_"+line_no+"'></tr>");            
+                    if (med_list.length == 0) {
+                        // <!---Need new Modal!-->
+                        
+                    } else if (med_list.length > 1){
+                        input_name = modal_option_builder("multi", line);
+                        $("#multi_med_modal").modal('show');
+                        //----------  WAIT FOR $("#multi-submit-btn").click() HERE!! -----------//
+                        $("#multi-submit-btn").click( () => { 
+                            radio_id = $("input[name='" + input_name + "']:checked").val()
+                            for (i = 1; i < med_list.length; i++) { 
+                                if (med_list[i].id == radio_id) {
+                                    radio_med = med_list[i];
+                                    break;
+                                }
+                            };
+                            radio_html_name = html_builder(radio_med)
+                            $('#output_'+line_no).append("<th scope='row'>"+radio_html_name+"</th><td>"+dose+"</td><td>"+ sig+ "</td><td>"+radio_med.med_commonuses+ "</td>");
+                            $("#multi_med_modal").modal('hide');
+                        })
+                    } else {
+                        html_name = html_builder(med_list[0]);          
+                        $('#output_'+line_no+'').append("<th scope='row'>"+html_name+"</th><td>"+dose+"</td><td>"+ sig+ "</td><td>"+ med_list[0].med_commonuses+ "</td>");
+                    }
+                })
+            }
+        })
+    });
+
+
+    /*<------------Build title and body for Modal form----------->
+    send to form to select correct medicaiton*/
+    function modal_option_builder(modal_type, line) {
+        if (modal_type =="multi") {
+            $("#multi_med_modal_form").empty()
+
+            input_text = line[0]
+            med_list = line[1]
+            $("#modaltitle").html('Multiple medications found for "'+input_text+'"!'); //set modal title to line string where multiple medications found
+
+            form_lines=[]
+            for (i = 0; i < med_list.length; i++) { 
+                input_type = "radio";
+                input_id = input_type +"_"+med_list[i].id;
+                input_name = input_type+'-'+ input_text.replace(' ', '-');
+                $("#multi_med_modal_form").append(`
+                        <div class="form-check">
+                            <input class="form-check-input" type="`+input_type+`" name="`+input_name+`" id="`+input_id+`" value="`+med_list[i].id+`">
+                            <label class="form-check-label" for="`+input_id+`">`+med_list[i].display_name+`</label>
+                        </div>`);
+            };
+            return input_name;
+        } else if (modal_type = "no_match") {
+            $("#modaltitle").html('No matches found for"'+med_list[0]+'"!');
+            $("#multi_med_modal_form").html("");
+
+        }
+        
+    };
+
+    /*------------URL Getter function-------------
+    gets url of medication based on pk  */
+    function url_getter(med_pk){
+        for (med_url_key in Object.keys(med_urls)) {
+            if (med_pk == med_url_key) { break; }
+        }
+        match_url = med_urls[med_url_key];
+        return match_url;
+    };
+
+
+/*<-------------------get medication by pk--------------------->
+returns medication object when pk given*/
+    function get_med_by_pk(med_pk){
+        {% for med in med_set %}
+            if ( {{med.pk}} == med_pk) {
+                med = '{{med}}';
+                med.display_name = '{{med.display_name}}';
+            }
+        {% endfor %}
+        return med
+        }
+
+    // }
+    /*<-----------Generate HTML list item---------------->
+    generate hyperlink for medication name*/
+    function html_builder(med, href_target="_blank"){
+        med_url = url_getter(med.id);
+   
+        pover_text = ''
+        if (med.med_pronun != '') {
+            pover_text += "Pronunciation: " + med.med_pronun + "<br>";
+        };
+        if (med.med_commonuses != '') {
+            pover_text += "Treats: " + med.med_commonuses + "<br>";
+        } ;
+        html_name = 
+            '<a href="'+med_url+'" '+
+            'target="'+href_target+ '" '+
+            'data-toggle="popover" '+
+            'data-html = "true" '+
+            'data-trigger = "hover" '+
+            'data-placement="top" '+
+            'title="'+ med.display_name+ '" '+
+            'data-content="'+pover_text+'"'+
+            '>'+med.display_name+'</a>';
+        console.log(html_name)
+        return html_name
+    }
+
+//<!---Get value from radio buttons-->
+    function radio_val_getter(radio_name){
+  
+            var radioValue = $("input[name='"+radio_name+"']:checked").val();
+            if(radioValue){
+                return radioValue;
+            } else {
+                alert("Please select a value");
+            }
+
+        }
+
+    $(document).ready(function(){
+        $('[data-toggle="popover"]').popover();   
+        });
+
+
+
+
+
+</script>
+{% endblock content %}
+
+{% block javascript %}
+
+{% endblock javascript %}
+
+

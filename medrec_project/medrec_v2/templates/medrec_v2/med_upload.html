@@ -1,0 +1,103 @@
+{% extends 'medrec_v2/base.html' %}
+
+{% block header %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h1 class="display-2">Medication Upload</h1>
+        </div>
+    </div>
+</div>
+{% endblock header %}
+
+{%  block content  %}
+    {% if messages %}
+        <div class='container-fluid'>
+            {% for message in messages %}
+                <div class = 'row'>
+                    <div class="col">
+                        <strong>{{message|safe}}</strong>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+    </br>   
+    <!-- <div class='container-fluid'>
+        <div class = 'row'>
+            <div class="col">
+                <small class="text-muted">{{order}}</small>
+            </div>
+        </div>
+    </div>
+    </br> -->
+    <div class='container-fluid'>
+            <form id="file_upload_form" action="" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class = "row">
+                    <div class="col">
+                        <div class="mb-3"></div>
+                            <h3 class = "form-label">Is this for the Base Meds or Final Medications?</h3>
+                            <div class="form-control">
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" value="db_base" id="db_base" name="db_select"></input>
+                                    <label class="form-check-label" for="db_base">Base Meds</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" value="db_final" id="db_final" name="db_select"></input>
+                                    <label class="form-check-label" for="db_base">Final Meds</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class = "row">
+                    <div class="col m-3">
+                        <h3 class="form-label"> Upload a file</h3>
+                        <input type="file" class="form-control" id="file1" name="file"></input>
+                        <div class="col m-2">
+                            <button class = "" type="submit" >Upload</button>
+                            <small>Only accepts CSV files</small>
+                            <div class="alert alert-danger" role="alert" name="sel_alert" hidden> Please select "Base Meds" or "Final Meds"</div>
+                        </div>
+                    </div>
+                </div>                        
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">
+                <table class="table">
+                    <thead>
+                        <th scope="col">Medication Name</th>
+                        <th scope="col">Medication Route</th>
+                        <th scope="col">Medication ID</th>
+                    </thead>
+                    <tbody>
+                        {% for med in meds %}
+                            <tr>
+                                <th scope = "row">{{med.display_name}}</th>
+                                <td>{{med.med_route}}</td>                                    
+                                <td>{{med.id}}</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>>
+            </div>
+        </div>
+    </div>
+    </div>
+
+    <!-- <script>
+        $("#file_upload_form").submit(function(e) {
+            e.preventDefault();
+            if ( $("#db_select:checked").length <1) {
+                $('#sel_alert').hidden = false;
+                return false;
+            }
+        })
+    </script> -->
+{% endblock %}

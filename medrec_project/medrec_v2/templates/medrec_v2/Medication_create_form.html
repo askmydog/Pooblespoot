@@ -1,0 +1,33 @@
+{% extends 'medrec_v2/base.html' %}
+
+{% load widget_tweaks %}
+
+{% load static %}
+
+{% block content %}
+
+<div class="container-fluid">
+    <form id="add_med_form" action="" method="POST">
+        {% csrf_token %}
+        {% for field in form.visible_fields %}
+        <div class="form-group">
+            <label for='{{field.id_for_label}}'>{{field.label}}</label>
+            {{field}}
+        </div>
+        {% endfor %}
+        <button class="btn btn-primary">Add Med</button>
+
+    </form>
+
+
+</div>
+
+<div class="container-fluid">
+    <ul>
+    {% for med in med_set%}
+    <li>{{med.trade_name}}  {{med.generic_name}}</li>
+    {% endfor %}
+    </ul>
+</div>
+
+{% endblock content %}

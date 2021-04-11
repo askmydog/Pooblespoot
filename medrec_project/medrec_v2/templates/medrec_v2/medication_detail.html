@@ -1,0 +1,62 @@
+{% extends 'medrec_v2/base.html' %}
+
+{% block header %}
+
+<div class="container-fluid">
+    <div class="row">
+        <h1>{{medication.display_name}}</h1>
+    </div>
+</div>
+
+
+
+{% endblock%}
+
+{% block content %}
+<div class="container-fluid">
+    <dl class="row">
+        <dt class = "col-sm-2"> Generic Name: </dt>
+        <dd class = "col-sm-9">{{medication.generic_name}}</dd>
+    </dl>
+    <dl class="row">
+        <dt class = "col-sm-2"> Trade Name: </dt>
+        <dd class = "col-sm-9">{{medication.trade_name}}</dd>
+    </dl>
+    <dl class="row">
+        <dt class = "col-sm-2"> Medication type: </dt>
+        <dd class = "col-sm-9">
+        {% for type in medication.med_type.all %}
+        {{type.type_name}}
+        {% endfor %}
+        </dd>
+    </dl>
+    <dl class="row">
+        <dt class = "col-sm-2"> Pronunciation: </dt>
+        <dd class = "col-sm-9">{{medication.med_pronun}}</dd>
+    </dl>
+    <dl class="row">
+        <dt class = "col-sm-2"> Common Uses: </dt>
+        <dd class = "col-sm-9">{{medication.med_commonuses}}</dd>
+    </dl>
+    <dl class="row">
+        <dt class = "col-sm-2"> Notes: </dt>
+        <dd class = "col-sm-9">{{medication.notes}}</dd>
+    </dl>
+    <dl class="row">
+        <dt class = "col-sm-2"> Route: </dt>
+        <dd class = "col-sm-9">        
+            {% for route in medication.med_route.all %}
+            {{route.route_name}}
+            {% endfor %}</dd>
+    </dl>
+    <dl class="row">
+        <dt class = "col-sm-2"> Qualifiers: </dt>
+        <dd class = "col-sm-9">            
+            {% for qual in medication.med_qualifiers.all %}
+            {{qual.qual_name}}
+            {% endfor %}</dd>
+    </dl>
+</div>
+
+{% endblock content %}
+

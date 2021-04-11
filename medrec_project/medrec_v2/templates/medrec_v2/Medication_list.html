@@ -1,0 +1,21 @@
+{% extends 'medrec_v2/base.html' %}
+
+{% block content %}
+
+<h1>Medication List</h1>
+
+{% if medication_list %}
+<ul>
+    {% for med in medication_list %}
+    <li>
+        <a href='{{med.get_absolute_url}}'>{{med}}</a>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<h3>No medication list</h3>
+
+{% endif %}
+
+{% endblock content %}
+
