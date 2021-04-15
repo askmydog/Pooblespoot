@@ -4,7 +4,6 @@
   "description": "Medication Reconciliation Tool",
   "main": "frontend/src/application/app.js",
   "dependencies": {
-    "@popperjs/core": "^2.9.2",
     "abab": "^2.0.5",
     "abbrev": "^1.1.1",
     "acorn": "^8.1.0",
@@ -62,6 +61,7 @@
     "esprima": "^4.0.1",
     "estraverse": "^5.2.0",
     "esutils": "^2.0.3",
+    "exports-loader": "^2.0.0",
     "extend": "^3.0.2",
     "extsprintf": "^1.3.0",
     "fast-deep-equal": "^3.1.3",
@@ -103,7 +103,6 @@
     "isarray": "^1.0.0",
     "isexe": "^2.0.0",
     "isstream": "^0.1.2",
-    "jquery": "^3.6.0",
     "js-base64": "^2.6.4",
     "jsbn": "^0.1.1",
     "jsdom": "^16.5.2",
@@ -250,5 +249,10 @@
   "bugs": {
     "url": "https://github.com/askmydog/Pooblespoot/issues"
   },
-  "homepage": "https://github.com/askmydog/Pooblespoot#readme"
+  "homepage": "https://github.com/askmydog/Pooblespoot#readme",
+  "devDependencies": {
+    "@popperjs/core": "^2.9.2",
+    "expose-loader": "^2.0.0",
+    "jquery": "^3.6.0"
+  }
 }

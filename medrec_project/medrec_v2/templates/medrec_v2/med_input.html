@@ -27,15 +27,32 @@
     </form>
 </div>
 
+<div><a href="#" id='test' data-toggle='popover' >Popover test</a></div>
+<!-- data-bs-trigger="hover" data-bs-html="true" title="Successful Popover" data-bs-content="This is some <b>content</b>"   -->
+<div>
+    <table class="table">
+        <thead class="thead">
+            <tr>
+                <th scope="col">Medication</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th scope="row"><a href="http://127.0.0.1:8000/meds/581/" target="_blank" data-toggle="popover" data-bs-html = "true" data-bs-trigger = "hover" data-bs-placement="top" title="Glucophage (METFORMIN)" data-bs-content="Pronunciation: met-FOR-min<br>Treats: Diabetes<br>">Glucophage (METFORMIN)</a></th>
+            </tr>
+        </tbody>
+    </table>
+</div>
+
 <div class="container m-3">
     <div class="row">
         <div class="col-md">
             <table class="table table-hover table-fixed">
                 <thead class="thead-light">
                   <tr> 
-                    <th scope="col" style="width: 25%">Medication</th>
-                    <th scope="col" style="width: 15%">Dose</th>
-                    <th scope="col" style="width 40%">Instructions</th>
+                    <th scope="col" >Medication</th>
+                    <th scope="col" >Dose</th>
+                    <th scope="col" >Instructions</th>
                     <th scope="col">Common Uses</th>
                   </tr>
                 </thead>
@@ -47,24 +64,24 @@
     
 </div>
 
-<div id="multi_med_modal" class="modal" tabindex="-1" role="dialog">
+<div id="multi-med-modal" class="modal" tabindex="-1" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title" id="modaltitle"> Multiple Medications Found!</h4>
-                    <button type="button" class="close" data-dismiss="modal" data-target="#multi_med_modal">&times;</button>
+                    <h4 class="modal-title" id="multi-modal-title"> Multiple Medications Found!</h4>
+                    <button type="button" class="close" data-dismiss="modal" data-target="#multi-med-modal">&times;</button>
                 </div>
                 <div class="modal-body">
                     <div class="container-fluid" >
                     <form>
                         <div class="row">
                             <div class = "col-">
-                            <div class="input_group" id="multi_med_modal_form"></div>
+                            <div class="input_group" id="multi-modal_form"></div>
                             </div>
                         </div>
                         <div class="row">
                             <button type="button" class="btn btn-primary" id="multi-submit-btn">Submit</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal" data-target="#multi_med_modal">close</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal" data-target="#multi-med-modal">close</button>
                         </div>
                     </form>
                     </div>
@@ -74,34 +91,45 @@
     </div>
 </div>
 
-<div id="no_med_modal" class="modal" tabindex="-1" role="dialog">
+<div id="no-med-modal" class="modal" tabindex="-1" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title" id="modaltitle"> Multiple Medications Found!</h4>
-                    <button type="button" class="close" data-dismiss="modal" data-target="#no_med_modal">&times;</button>
-                </div>
-                <div class="modal-body">
-                    <div class="container-fluid" >
-                    <form>
-                        <div class="row">
-                            <div class = "col-">
-                            <div class="input_group" id="no_med_modal_form"></div>
+            <div class="modal-header">
+                <h4 class="modal-title" id="no-modal-title"> No Medications Found!</h4>
+                <button type="button" class="close" data-dismiss="modal" data-target="#no-med-modal">&times;</button>
+            </div>
+            <div class="modal-body" >
+                <div class="container-fluid" >
+                    <div class="row">
+                        <div class="col">
+                            <h3 id="no-modal-prompt">Please select the correct medication from the database</h3>
+                        </div>
+                    </div>
+                <form autocomplete="off">
+                    <div class="row">
+                        <div class = "col-">
+                        <div class="input_group" id="no-modal-form">
+                            <div class="autocomplete">
+                                <input type="text" id="no-modal-autocomplete" name="no-modal-autocomplete" placeholder="Select the correct medication">
                             </div>
                         </div>
-                        <div class="row">
-                            <button type="button" class="btn btn-primary" id="no-submit-btn">Submit</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal" data-target="#no_med_modal">close</button>
                         </div>
-                    </form>
                     </div>
+                </form>
                 </div>
-                <div class="modal-footer">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="no-submit-btn">Submit</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal" data-target="#no-med-modal">close</button>
+            </div>
         </div>
     </div>
 </div>
 
 
+<div hidden="true">
+
+</div>
 <script>
     console.log('MedInput page loaded');
 
@@ -112,6 +140,7 @@
         var abs_url = '{{med.get_absolute_url}}'
         abs_url = abs_url.slice(1)
         med_urls[{{med.pk}}] = url_path+abs_url
+        
     {% endfor %}
     // var med_urls = JSON.parse("{{med_urls|escapejs}}")
 
@@ -128,8 +157,8 @@
             url: '{% url "medrec_v2:post_medrec" %}',
             data: serializedData,
             success: function(response) {
-                $('#med_output').html("");
-
+                $('#med_output').empty();
+                prevMedList = []
                 var med_ajax = JSON.parse(response["med_output"]);
                 line_no = 0
                 med_ajax.line.forEach(line => {
@@ -141,11 +170,17 @@
                     sig = line[3]
                     $('#med_output').append("<tr id='output_"+line_no+"'></tr>");            
                     if (med_list.length == 0) {
-                        // <!---Need new Modal!-->
+                        
+                        $("#no-med-modal").modal("show");
+                        console.log("no-med-modal shown")
+                        $("#multi-submit-btn").click( () => { 
+
+                        });
+
                         
                     } else if (med_list.length > 1){
-                        input_name = modal_option_builder("multi", line);
-                        $("#multi_med_modal").modal('show');
+                        input_name = multi_modal_builder(line);
+                        $("#multi-med-modal").modal('show');
                         //----------  WAIT FOR $("#multi-submit-btn").click() HERE!! -----------//
                         $("#multi-submit-btn").click( () => { 
                             radio_id = $("input[name='" + input_name + "']:checked").val()
@@ -156,12 +191,21 @@
                                 }
                             };
                             radio_html_name = html_builder(radio_med)
-                            $('#output_'+line_no).append("<th scope='row'>"+radio_html_name+"</th><td>"+dose+"</td><td>"+ sig+ "</td><td>"+radio_med.med_commonuses+ "</td>");
-                            $("#multi_med_modal").modal('hide');
+                            $('#output_'+line_no).append("<tr><th scope='row'>"+radio_html_name+"</th><td>"+dose+"</td><td>"+ sig+ "</td><td>"+radio_med.med_commonuses+ "</td></tr>");
+                            $("#multi-med-modal").modal('hide');
+                            prevMedList.append([radio_id,dose]);
                         })
                     } else {
+                        for (i in prevMedList) {
+                            if (med_list[0].id == prevMedList[0]){
+                                prev="true";
+                                break;
+                        }}; 
+                        if (prev=="true"){continue};
                         html_name = html_builder(med_list[0]);          
-                        $('#output_'+line_no+'').append("<th scope='row'>"+html_name+"</th><td>"+dose+"</td><td>"+ sig+ "</td><td>"+ med_list[0].med_commonuses+ "</td>");
+                        // console.log(html_name);
+                        $('#output_'+line_no+'').append("<th scope='row'>"+html_name+"</th> <td>"+dose+"</td> <td>"+ sig+ "</td> <td>"+med_list[0].med_commonuses+ "</td>");
+                        prevMedList.append([radio_id,dose]);
                     }
                 })
             }
@@ -169,35 +213,53 @@
     });
 
 
+    function prev_med_match(new_med,reset){
+        
+    };
+
     /*<------------Build title and body for Modal form----------->
     send to form to select correct medicaiton*/
-    function modal_option_builder(modal_type, line) {
-        if (modal_type =="multi") {
-            $("#multi_med_modal_form").empty()
+    function multi_modal_builder(line) {
+            $("#multi-med-modal_form").empty()
 
             input_text = line[0]
             med_list = line[1]
-            $("#modaltitle").html('Multiple medications found for "'+input_text+'"!'); //set modal title to line string where multiple medications found
+            $("#multi-modal-title").html('Multiple medications found for "'+input_text+'"!'); //set modal title to line string where multiple medications found
 
             form_lines=[]
             for (i = 0; i < med_list.length; i++) { 
                 input_type = "radio";
                 input_id = input_type +"_"+med_list[i].id;
                 input_name = input_type+'-'+ input_text.replace(' ', '-');
-                $("#multi_med_modal_form").append(`
+                $("#multi-modal_form").append(`
                         <div class="form-check">
                             <input class="form-check-input" type="`+input_type+`" name="`+input_name+`" id="`+input_id+`" value="`+med_list[i].id+`">
                             <label class="form-check-label" for="`+input_id+`">`+med_list[i].display_name+`</label>
                         </div>`);
             };
-            return input_name;
-        } else if (modal_type = "no_match") {
-            $("#modaltitle").html('No matches found for"'+med_list[0]+'"!');
-            $("#multi_med_modal_form").html("");
+            return input_name;     
+        };
 
-        }
-        
-    };
+        function no_modal_builder(line) {
+            $("#no-med-modal_form").empty()
+
+            input_text = line[0]
+            med_list = line[1]
+            $("#no-modal-title").html('No medications found for "'+input_text+'"!'); //set modal title to line string where multiple medications found
+
+            form_lines=[]
+            for (i = 0; i < med_list.length; i++) { 
+                input_type = "radio";
+                input_id = input_type +"_"+med_list[i].id;
+                input_name = input_type+'-'+ input_text.replace(' ', '-');
+                $("no-modal-form").append(`
+                        <div class="form-check">
+                            <input class="form-check-input" type="`+input_type+`" name="`+input_name+`" id="`+input_id+`" value="`+med_list[i].id+`">
+                            <label class="form-check-label" for="`+input_id+`">`+med_list[i].display_name+`</label>
+                        </div>`);
+            };
+            return input_name;     
+        };
 
     /*------------URL Getter function-------------
     gets url of medication based on pk  */
@@ -228,24 +290,21 @@ returns medication object when pk given*/
     function html_builder(med, href_target="_blank"){
         med_url = url_getter(med.id);
    
-        pover_text = ''
+        pover_content = "";
         if (med.med_pronun != '') {
-            pover_text += "Pronunciation: " + med.med_pronun + "<br>";
+            pover_content += "<b>Pronunciation: </b>" + med.med_pronun +"</br>";
         };
         if (med.med_commonuses != '') {
-            pover_text += "Treats: " + med.med_commonuses + "<br>";
+            pover_content += "<b>Used For: </b>  " + med.med_commonuses;
         } ;
+        pover_content += "</table>";
         html_name = 
             '<a href="'+med_url+'" '+
             'target="'+href_target+ '" '+
             'data-toggle="popover" '+
-            'data-html = "true" '+
-            'data-trigger = "hover" '+
-            'data-placement="top" '+
             'title="'+ med.display_name+ '" '+
-            'data-content="'+pover_text+'"'+
+            'data-bs-content="'+pover_content+'"'+
             '>'+med.display_name+'</a>';
-        console.log(html_name)
         return html_name
     }
 
@@ -261,12 +320,19 @@ returns medication object when pk given*/
 
         }
 
+    var popOverSettings = {
+        // "data-toggle":"popover",
+        // selector: '#test', //Sepcify the selector here
+        trigger:"hover",
+        selector: "[data-toggle='popover']",
+        html:true,
+        placement:"top",
+        };
+
+
     $(document).ready(function(){
-        $('[data-toggle="popover"]').popover();   
+        $("body").popover(popOverSettings);
         });
-
-
-
 
 
 </script>

@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'medrec_v2',
+    'webpack_loader',
+    # 'django-csv-export-view',
 ]
 
 MIDDLEWARE = [
@@ -125,8 +127,12 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR,'static'),
-    os.path.join(BASE_DIR, 'medrec_v2/static')
+    os.path.join(BASE_DIR, 'medrec_v2/static'),
+    os.path.join(BASE_DIR, "frontend/build"),
     ]
 
+WEBPACK_LOADER = {
+    'MANIFEST_FILE': os.path.join(BASE_DIR, "frontend/build/manifest.json"),
+}
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'

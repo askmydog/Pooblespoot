@@ -8,10 +8,12 @@ from django.core import serializers
 from medrec_v2.scripts.medrec_v2.functions import med_match, csv_fk_field_builder, med_match_v2, extract_dose
 from django.contrib import messages
 from django.db.models import F, Q
-
 from medrec_v2.models import Medication, MedQualifier, MedRoute, MedType, BaseMed
 from medrec_v2.forms import MedInputForm, AddMedForm
-import re, json, csv, io
+import re, json, csv, io, csv
+from datetime import datetime
+from django.apps import apps
+
 
 class MedInputView(View):
     form_class = MedInputForm
@@ -243,5 +245,26 @@ class MedDbUpload(View):
 
             context = {'meds':Medication.objects.all()}
             return render(request, self.template_name, context)
+
+class CSVExportView(View):
+    model_name = 'Medication'
+    model = apps.get_model(app_label='medrec_v2',model_name=model_name)
+    content_type = 'text/csv'
+    datecode = datetime.today().strftime('%y%m%d')
+    file_name = f'{datecode}_{model}_export.csv'
+
+    def get(self, request, *args, **kwargs):
+        response = HttpResponse(content_type = self.content_type)
+        response['Content-Disposition'] = f'attachment/filename="{self.file_name}"'
+        
+        writer = csv.writer(response)
+
+        for instance in self.model.objects.all():
+            for field in instance._meta.get_fields(include_parents=False):
+                pass
+
+
+        pass
+
 
 # Create your views here.

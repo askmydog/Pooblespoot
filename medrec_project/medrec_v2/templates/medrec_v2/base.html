@@ -1,5 +1,7 @@
 {% load static %}
 
+{% load webpack_loader static %}
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,13 +10,13 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>{% block title %}Medication Reconciliation{% endblock title %}</title>
-    {% stylesheet_pack 'app' %}
+    <!-- <script src='{% static "medrec_v2/js/bootstrap.min.js" %}'></script>
     <script src='{% static "medrec_v2/js/jquery-3.6.0.min.js" %}'></script>
-    <link rel="stylesheet" href="{% static 'medrec_v2/css/bootstrap.min.css' %}">
-    <script src="{% static 'medrec_v2/js/bootstrap.min.js' %}"></script>
-    <script src="{% static 'medrec_v2/js/popper.min.js' %}"></script>
+    <link rel="stylesheet" type="text/css" href='{% static "medrec_v2/css/bootstrap.min.css" %}'> -->
 
-    
+  
+    {% stylesheet_pack 'app' %}
+    {% javascript_pack 'app' 'app2' attrs='charset="UTF-8"' %}
 
     {% block style %}
     {% endblock style %}
@@ -31,6 +33,7 @@
     {% endblock header %}
 
     {% block content %}
+    
     {% endblock content %}
 
 
@@ -38,8 +41,8 @@
 
     {% endblock javascript %}
 
+
 </body>
 
-{% javascript_pack 'app' 'app2' attrs='charset="UTF-8"' %}
 
 </html>
